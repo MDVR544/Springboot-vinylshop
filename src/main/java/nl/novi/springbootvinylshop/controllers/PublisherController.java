@@ -1,6 +1,8 @@
 package nl.novi.springbootvinylshop.controllers;
 
-import nl.novi.springbootvinylshop.entities.Publisher;
+import jakarta.validation.Valid;
+import nl.novi.springbootvinylshop.dtos.publisher.PublisherRequestDTO;
+import nl.novi.springbootvinylshop.dtos.publisher.PublisherResponseDTO;
 import nl.novi.springbootvinylshop.helpers.UrlHelper;
 import nl.novi.springbootvinylshop.services.PublisherService;
 import org.springframework.http.ResponseEntity;
@@ -20,25 +22,25 @@ public class PublisherController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Publisher> getOnePublisher(@PathVariable Long id){
+    public ResponseEntity<PublisherResponseDTO> getOnePublisher(@PathVariable Long id){
         return ResponseEntity.ok(publisherService.findPublisherById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<Publisher>> getAllPublishers(){
+    public ResponseEntity<List<PublisherResponseDTO>> getAllPublishers(){
         return ResponseEntity.ok(publisherService.findAllPublishers());
     }
 
     @PostMapping
-    public ResponseEntity<Publisher> createPublisher(@RequestBody Publisher publisherInput){
-        Publisher newPublisher = publisherService.createPublisher(publisherInput);
-        return ResponseEntity.created(urlHelper.getCurrentUrlWithId(newPublisher.getId())).body(newPublisher);
+    public ResponseEntity<PublisherResponseDTO> createPublisher(@RequestBody @Valid PublisherRequestDTO publisherInput){
+        PublisherResponseDTO newPublisher = publisherService.createPublisher(publisherInput);
+        return ResponseEntity.created(urlHelper.getCurrentUrlWithId(newPublisher.id())).body(newPublisher);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Publisher> updatePublisher(@PathVariable Long id, @RequestBody Publisher publisherInput){
-        Publisher newPublisher = publisherService.updatePublisher(id, publisherInput);
-        return ResponseEntity.ok(newPublisher);
+    public ResponseEntity<PublisherResponseDTO> updatePublisher(@PathVariable Long id, @RequestBody @Valid PublisherRequestDTO publisherInput){
+        PublisherResponseDTO updatedPublisher = publisherService.updatePublisher(id, publisherInput);
+        return ResponseEntity.ok(updatedPublisher);
     }
 
     @DeleteMapping("/{id}")

@@ -30,18 +30,19 @@ public class PublisherController {
     }
 
     @PostMapping
-    public ResponseEntity<Publisher> createPublisher(@RequestBody Publisher publisher){
-        publisherService.createPublisher(publisher);
-        return ResponseEntity.created(urlHelper.getCurrentUrlWithId(publisher.getId())).body(publisher);
+    public ResponseEntity<Publisher> createPublisher(@RequestBody Publisher publisherInput){
+        Publisher newPublisher = publisherService.createPublisher(publisherInput);
+        return ResponseEntity.created(urlHelper.getCurrentUrlWithId(newPublisher.getId())).body(newPublisher);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Publisher> updatePublisher(@PathVariable Long id, @RequestBody Publisher publisherInput){
-        return ResponseEntity.ok(publisherService.updatePublisher(id, publisherInput));
+        Publisher newPublisher = publisherService.updatePublisher(id, publisherInput);
+        return ResponseEntity.ok(newPublisher);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePublisher(@PathVariable long id){
+    public ResponseEntity<Void> deletePublisher(@PathVariable Long id){
         publisherService.deletePublisher(id);
         return ResponseEntity.noContent().build();
     }

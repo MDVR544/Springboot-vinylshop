@@ -31,18 +31,19 @@ public class GenreController {
     }
 
     @PostMapping
-    public ResponseEntity<Genre> createGenre(@RequestBody Genre genre){
-        genreService.createGenre(genre);
-        return ResponseEntity.created(urlHelper.getCurrentUrlWithId(genre.getId())).body(genre);
+    public ResponseEntity<Genre> createGenre(@RequestBody Genre genreInput){
+        Genre newGenre = genreService.createGenre(genreInput);
+        return ResponseEntity.created(urlHelper.getCurrentUrlWithId(newGenre.getId())).body(newGenre);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Genre> updateGenre(@PathVariable Long id, @RequestBody Genre genreInput){
-        return ResponseEntity.ok(genreService.updateGenre(id, genreInput));
+        Genre newGenre = genreService.updateGenre(id, genreInput);
+        return ResponseEntity.ok(newGenre);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGenre(@PathVariable long id){
+    public ResponseEntity<Void> deleteGenre(@PathVariable Long id){
         genreService.deleteGenre(id);
         return ResponseEntity.noContent().build();
     }

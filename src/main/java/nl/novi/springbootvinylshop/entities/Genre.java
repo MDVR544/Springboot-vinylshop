@@ -1,21 +1,18 @@
 package nl.novi.springbootvinylshop.entities;
 
-public class Genre {
-    /**
-     * Dit is een mock-model voor de Genre.
-     * In de volgende les ga je hier een echte entiteit voor maken.
-     */
-    private Long id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name= "genres")
+public class Genre extends BaseEntity {
+
+   @Column(name = "name")
     private String name;
+
+   @Column(name = "description")
     private String description;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

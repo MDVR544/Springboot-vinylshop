@@ -1,6 +1,11 @@
 package nl.novi.springbootvinylshop.services;
 
+import nl.novi.springbootvinylshop.dtos.publisher.PublisherRequestDTO;
+import nl.novi.springbootvinylshop.dtos.publisher.PublisherResponseDTO;
+import nl.novi.springbootvinylshop.entities.Genre;
 import nl.novi.springbootvinylshop.entities.Publisher;
+import nl.novi.springbootvinylshop.exceptions.ResourceNotFoundException;
+import nl.novi.springbootvinylshop.mappers.PublisherDTOMapper;
 import nl.novi.springbootvinylshop.repository.PublisherRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,47 +16,54 @@ import java.util.Optional;
 public class PublisherService {
 
     private final PublisherRepository publisherRepository;
+    private final PublisherDTOMapper  publisherDTOMapper;
 
-    public PublisherService(PublisherRepository publisherRepository) {
+    public PublisherService(PublisherRepository publisherRepository, PublisherDTOMapper publisherDTOMapper) {
         this.publisherRepository = publisherRepository;
+        this.publisherDTOMapper = publisherDTOMapper;
     }
 
-    public List<Publisher> findAllPublishers() {
-        return this.publisherRepository.findAll();
+    public List<PublisherResponseDTO> findAllPublishers() {
+        List<Publisher> existingPublisherList = this.publisherRepository.findAll();
+
+        return publisherDTOMapper.mapToDto(existingPublisherList);
     }
-    public Publisher findPublisherById(Long id) {
+
+    public PublisherResponseDTO findPublisherById(Long id) {
         Optional<Publisher> existingPublisher = this.publisherRepository.findById(id);
-        if (existingPublisher.isPresent()){
-            return  existingPublisher.get();
-        } else {
-            return null;
-        }
+
+        Publisher publisher = existingPublisher.orElseThrow(
+                ()->new ResourceNotFoundException("Publisher not found!"));
+
+            return  publisherDTOMapper.mapToDto(publisher);
     }
 
-    public Publisher createPublisher(Publisher publisher) {
-        return this.publisherRepository.save(publisher);
+    public PublisherResponseDTO createPublisher(PublisherRequestDTO publisherDTO) {
+        Publisher publisher = publisherDTOMapper.mapToEntity(publisherDTO);
+        Publisher newPublisher = this.publisherRepository.save(publisher);
+
+        return publisherDTOMapper.mapToDto(newPublisher);
     }
 
-    public Publisher updatePublisher(Long id, Publisher publisherInput){
-        Publisher publisher = findPublisherById(id);
+    public PublisherResponseDTO updatePublisher(Long id, PublisherRequestDTO publisherInput){
+        Optional<Publisher> existingPublisher = this.publisherRepository.findById(id);
 
-        if(publisher != null) {
+            Publisher updatedPublisher = existingPublisher.orElseThrow(
+                    ()->new ResourceNotFoundException("Publisher not found!"));
 
-            publisher.setName(publisherInput.getName());
-            publisher.setAddress(publisherInput.getAddress());
-            publisher.setContactDetails(publisherInput.getContactDetails());
+            updatedPublisher.setName(publisherInput.name());
+            updatedPublisher.setAddress(publisherInput.address());
+            updatedPublisher.setContactDetails(publisherInput.contactDetails());
 
-            return this.publisherRepository.save(publisher);
-        } else {
-            return null;
-        }
+            Publisher savedPublisher = this.publisherRepository.save(updatedPublisher);
+
+            return publisherDTOMapper.mapToDto(savedPublisher);
     }
 
     public void deletePublisher(Long id) {
-        Publisher publisher = findPublisherById(id);
+        Optional<Publisher> existingPublisher = this.publisherRepository.findById(id);
 
-        if (publisher != null) {
-            this.publisherRepository.delete(publisher);
+        existingPublisher.ifPresent(this.publisherRepository::delete);
         }
     }
-}
+
